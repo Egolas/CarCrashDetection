@@ -118,6 +118,9 @@ def Traffic_Tracker(src, params, scale, inter_frames_alerts):
 
 
     cars_prev = vehicleDetector.detection(old_frame)
+    if len(cars_prev) > 0:
+        cars_prev[:, 2] = cars_prev[:, 2] - cars_prev[:, 0]
+        cars_prev[:, 3] = cars_prev[:, 3] - cars_prev[:, 1]
 
     # cars_prev = face_cascade.detectMultiScale(old_frame, **params['VJ']['cascade_params'])
     # # cars_prev = cv2.groupRectangles(np.array(cars_prev_pre).tolist(), 3, 0.2)
@@ -146,8 +149,11 @@ def Traffic_Tracker(src, params, scale, inter_frames_alerts):
             frame = frame_pre
 
         cars = vehicleDetector.detection(frame)
-        for x1, y1, x2, y2 in cars:
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (55 / 255.0, 255 / 255.0, 155 / 255.0), 2)
+        if len(cars) > 0:
+            cars[:, 2] = cars[:, 2] - cars[:, 0]
+            cars[:, 3] = cars[:, 3] - cars[:, 1]
+        # for x1, y1, x2, y2 in cars:
+        #     cv2.rectangle(frame, (x1, y1), (x2, y2), (55 / 255.0, 255 / 255.0, 155 / 255.0), 2)
 
         good_new_VJ, good_old_VJ = Match_Features(cars, cars_prev, params['VJ']['velocity_thr'],
                                                   params['VJ']['area_thr'])
@@ -167,7 +173,7 @@ def Traffic_Tracker(src, params, scale, inter_frames_alerts):
             velocity = np.sqrt(vx ** 2 + vy ** 2)
 
             # 检测目标移动且处于ROI中
-            if velocity > params['VJ']['velocity_thr'] and IsInROI(a, b, ROI):
+            if velocity*3.0 > params['VJ']['velocity_thr'] and IsInROI(a, b, ROI):
                 ROIs.append(new)
 
 
@@ -176,6 +182,7 @@ def Traffic_Tracker(src, params, scale, inter_frames_alerts):
                 #     cv2.putText(frame, "%d" % i, (a + w1/2, b-5),
                 #                 cv2.FONT_HERSHEY_PLAIN, 1.0, (255,0,0), lineType=line_type)
 
+                # cv2.rectangle(frame, (a, b), (a + w1, b + h1), color=(255, 0, 0), thickness=1)
                 cars_num += 1
                 VJ_velAvg = (VJ_velAvg * VJ_velCnt + velocity) / (VJ_velCnt + 1)
                 VJ_velCnt += 1
@@ -240,10 +247,10 @@ def Traffic_Tracker(src, params, scale, inter_frames_alerts):
             out.write(img)
             out_clone.write(img)
         '''
-
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        #
+        # cv2.imshow('frame', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
         if src > 0 and frmIndex >= framesNum:
             break

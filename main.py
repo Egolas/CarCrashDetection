@@ -14,11 +14,11 @@ class struct:
 
 
 def main(argv):
-    test_video = '/home/aythior/文档/traffic_accident/Inputs/Sample10.mp4'
+    test_video = '/home/aythior/文档/traffic_accident/Inputs/Sample2.mp4'
     args = struct(
         in_video=test_video,
         params=track_params(),
-        scale=2,
+        scale=1,
         inter_frames_alerts=90
     )
     try:
